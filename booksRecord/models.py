@@ -15,7 +15,7 @@ class Book (models.Model):
     # the comment above ↑ is to automatically generate a documentation
     # You should write such comments for everything you make.
     # Read more here: https://docs.djangoproject.com/en/2.2/ref/contrib/admin/admindocs/
-	
+    
     name = models.CharField(
         max_length=65, 
         db_index=True, 
@@ -43,18 +43,18 @@ class Book (models.Model):
         return self.name
 
 class Author (models.Model):
-	'''
-	Модель описывает всех авторов книг в библиотеке,
-	Ф.И.О. заполняется полностью.\n
+    '''
+    Модель описывает всех авторов книг в библиотеке,
+    Ф.И.О. заполняется полностью.\n
     <i style="color: lime">Правильно: Пушкин Александр Сергеевич</i>
     <i style="color: red">Неправильно: Пушкин А. С.</i>
-	Используется в :Model:`booksRecord.Book`.
-	Для иностранных авторов отчество можно не писать,
+    Используется в :Model:`booksRecord.Book`.
+    Для иностранных авторов отчество можно не писать,
     поля заполнять кириллицей, например:
-	<i>Джек Лондон</i>
-	'''
-	
-	first_name = models.CharField(
+    <i>Джек Лондон</i>
+    '''
+    
+    first_name = models.CharField(
         max_length=25,
         verbose_name='Имя',
     )
@@ -62,7 +62,7 @@ class Author (models.Model):
         max_length=25,
         verbose_name='Отчество'
     )
-	second_name = models.CharField(
+    second_name = models.CharField(
         max_length=25,
         verbose_name='Фамилия'
     )
@@ -77,9 +77,9 @@ class Author (models.Model):
             self.middle_name
         ))
      
-     def get_short_name(self):
-         return ' '.join((
+    def get_short_name(self):
+        return ' '.join((
             self.second_name,
             self.first_name[0] + '.',
-            self.middle_name[0] + '.' if self.middle_name
-         ))
+            [self.middle_name[0] + '.', None] [self.middle_name]
+        ))
