@@ -57,18 +57,18 @@ class Author (models.Model):
     first_name = models.CharField(
         max_length=25,
         verbose_name='Имя',
+        blank=False
     )
     middle_name = models.CharField(
         max_length=25,
-        verbose_name='Отчество'
+        verbose_name='Отчество',
+        blank=True
     )
     second_name = models.CharField(
         max_length=25,
-        verbose_name='Фамилия'
+        verbose_name='Фамилия',
+        blank=False
     )
-    
-    def __str__(self):
-       return get_short_name(self)
         
     def get_full_name(self):
         return ' '.join((
@@ -81,5 +81,8 @@ class Author (models.Model):
         return ' '.join((
             self.second_name,
             self.first_name[0] + '.',
-            [self.middle_name[0] + '.', None] [self.middle_name]
+            self.middle_name[0] + '.'
         ))
+    
+    def __str__(self):
+       return self.get_short_name()
