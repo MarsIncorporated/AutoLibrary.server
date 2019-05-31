@@ -67,8 +67,8 @@ class Author (models.Model):
         verbose_name='Фамилия'
     )
     
-    def __str__():
-       return 
+    def __str__(self):
+       return get_short_name(self)
         
     def get_full_name(self):
         return ' '.join((
