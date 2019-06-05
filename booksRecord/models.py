@@ -7,10 +7,10 @@ class Book (models.Model):
     Модель описывает любые книги в хранилище, будь то
     учебники или художественную литературу.
     Если книги имеют одинаковые наименования,
-    но разные года, то они считаются <b>разными</b>.
+    но разные года, то они считаются разными.\n
     Здесь хранится не каждый экземпляр книги, а только их описания.
-    К примеру, в хранилище есть 100 книг <i>Алгебра. 7 класс</i>, 
-    при этом в этой модели <u>хранится ТОЛЬКО ОДНА запись</u>.
+    К примеру, в хранилище есть 100 книг «Алгебра. 7 класс», 
+    при этом в этой модели хранится ТОЛЬКО ОДНА запись.
     '''
     # the comment above ↑ is to automatically generate a documentation
     # You should write such comments for everything you make.
@@ -20,69 +20,149 @@ class Book (models.Model):
         max_length=65, 
         db_index=True, 
         unique = True, 
-        verbose_name="Наименование",
-        help_text = 'Официальное наименование книги'
+        verbose_name="название",
+        help_text = 'Официальное название книги'
     )
-    annotation = models.TextField( #not sure that it's needed
-        max_length=200, 
-        verbose_name="Аннотация", 
-        blank=True,
-        help_text='''Аннотация книги, \
-взятая с обратной стороны титульного листа. \
-Желательна к заполнению.'''
-        # the text above is needed to generate a documentation
-    )
-    author = models.ManyToManyField(
-        'author',
-        verbose_name = "Автор(-ы)",
+    
+    authors = models.ManyToManyField(
+        'Author',
+        verbose_name = "автор(-ы)",
         help_text = '''Автор или авторы книги, \
 ссылается на :Model:`booksRecord.Author`'''
     )
     
+    publisher = models.ForeignKey(
+        'Publisher',
+        on_delete=models.PROTECT,
+        db_index=False,
+        verbose_name='издательство'
+    
+    year_of_publishing = models.SmallIntegerField(
+        verbose_name="год издания"
+    )
+    
+    edition = models.SmallIntegerField(
+        verbose_name='номер издания'
+    )
+    
+    inventory_number = models.SmallIntegerField(
+        verbose_name='инвентарный номер'
+    )
+    
+    publishing_city = models.CharField(
+        max_length=30,
+        verbose_name="город издания",
+        help_text = 'город издания книги, без "г. "'
+    )
+    
     def __str__(self):
         return self.name
+        
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'книга'
+        verbose_name_plural = 'книги'
 
 class Author (models.Model):
     '''
     Модель описывает всех авторов книг в библиотеке,
     Ф.И.О. заполняется полностью.\n
-    <i style="color: lime">Правильно: Пушкин Александр Сергеевич</i>
-    <i style="color: red">Неправильно: Пушкин А. С.</i>
-    Используется в :Model:`booksRecord.Book`.
-    Для иностранных авторов отчество можно не писать,
-    поля заполнять кириллицей, например:
-    <i>Джек Лондон</i>
+    Правильно:\n
+    \tФамилия:\tПушкин\n
+    \tИмя:\tАлександр\n
+    \tОтчество:\tСергеевич\n
+    Неправильно:
+    \tФамилия:\tПушкин\n
+    \tИмя:\tА.\n
+    \tОтчество:\tС.\n\n
+    Для записи иностранных авторов использовать кириллицу,
+    отчество можно не указывать.\n
+    Правильно:
+    \tФамилия:\tЛондон\n
+    \tИмя:\tДжек\n
+    \tОтчество:\t\n
+    Неправильно:
+    \tФамилия:\tLondon\n
+    \tИмя:\tJack\n
+    \tОтчество:\tGriffith
     '''
     
     first_name = models.CharField(
         max_length=25,
-        verbose_name='Имя',
-        blank=False
-    )
-    middle_name = models.CharField(
-        max_length=25,
-        verbose_name='Отчество',
-        blank=True
+        verbose_name='имя',
+        blank=False,
+        help_text='Имя автора кириллицей'
     )
     second_name = models.CharField(
         max_length=25,
-        verbose_name='Фамилия',
-        blank=False
+        verbose_name='фамилия',
+        blank=False,
+        help_text='Фамилия автора кириллицей'
     )
-        
-    def get_full_name(self):
+    middle_name = models.CharField(
+        max_length=25,
+        verbose_name='отчество',
+        blank=True,
+        help_text='Отчество автора кириллицей, необязательно'
+    )
+    
+    @property
+    def full_name(self):
         return ' '.join((
             self.second_name, 
             self.first_name, 
             self.middle_name
         ))
-     
-    def get_short_name(self):
+    
+    @property
+    def short_name(self):
+        '''
+        The if below is required
+        because the Index out of bounds will be raised,
+        if the person hasn't a middle_name (try do ''[0] + '.')
+        '''
+        
+        if self.middle_name:
+            _middle_name = self.middle_name[0] + '.'
+        
         return ' '.join((
             self.second_name,
             self.first_name[0] + '.',
-            self.middle_name[0] + '.'
+            _middle_name
         ))
     
     def __str__(self):
-       return self.get_short_name()
+       return self.short_name
+       
+    class Meta:
+        ordering = ['short_name']
+        verbose_name = 'автор'
+        verbose_name_plural = 'авторы'
+
+class Publisher (models.Model):
+	'''
+	Модель описывает каждое издательство,
+	в название не надо писать форму собственности
+	предприятием (слова "ООО", "ПАО"), а также само
+	слово "Издательство".\n
+	Правильно:\n
+	\tНаименование:\tЭксмо\n
+	Неправильно:\n
+	\t Наименование:\tООО "Издательство "Эксмо"
+	'''
+    name = models.CharField(
+        max_length=65, 
+        db_index=True, 
+        unique = True, 
+        verbose_name="наименование",
+        help_text = '''Официальное наименование 
+издательства, без слов "Издательство", "ООО", "ПАО" и т. п.'''
+    )
+    
+    def __str__(self):
+        return self.name
+        
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'издательство'
+        verbose_name_plural = 'издательства'
