@@ -36,6 +36,7 @@ class Book (models.Model):
         on_delete=models.PROTECT,
         db_index=False,
         verbose_name='издательство'
+    )
     
     year_of_publishing = models.SmallIntegerField(
         verbose_name="год издания"
@@ -71,21 +72,29 @@ class Author (models.Model):
     \tФамилия:\tПушкин\n
     \tИмя:\tАлександр\n
     \tОтчество:\tСергеевич\n
-    Неправильно:
+    Неправильно:\n
     \tФамилия:\tПушкин\n
     \tИмя:\tА.\n
-    \tОтчество:\tС.\n\n
-    Для записи иностранных авторов использовать кириллицу,
-    отчество можно не указывать.\n
-    Правильно:
+    \tОтчество:\tС.\n
+    Для записи иностранных авторов 
+    использовать кириллицу, отчество
+    можно не указывать.\n
+    Правильно:\n
     \tФамилия:\tЛондон\n
     \tИмя:\tДжек\n
     \tОтчество:\t\n
-    Неправильно:
+    Неправильно:\n
     \tФамилия:\tLondon\n
     \tИмя:\tJack\n
     \tОтчество:\tGriffith
     '''
+    
+    second_name = models.CharField(
+        max_length=25,
+        verbose_name='фамилия',
+        blank=False,
+        help_text='Фамилия автора кириллицей'
+    )
     
     first_name = models.CharField(
         max_length=25,
@@ -93,12 +102,7 @@ class Author (models.Model):
         blank=False,
         help_text='Имя автора кириллицей'
     )
-    second_name = models.CharField(
-        max_length=25,
-        verbose_name='фамилия',
-        blank=False,
-        help_text='Фамилия автора кириллицей'
-    )
+    
     middle_name = models.CharField(
         max_length=25,
         verbose_name='отчество',
@@ -108,6 +112,10 @@ class Author (models.Model):
     
     @property
     def full_name(self):
+        '''
+        возвращает полное имя автора.\n
+        Например: Пушкин Александр Сергеевич
+        '''
         return ' '.join((
             self.second_name, 
             self.first_name, 
@@ -117,6 +125,10 @@ class Author (models.Model):
     @property
     def short_name(self):
         '''
+        возвращает короткое имя автора.
+        Например: Пушкин А. С.
+        '''
+        '''
         The if below is required
         because the Index out of bounds will be raised,
         if the person hasn't a middle_name (try do ''[0] + '.')
@@ -124,6 +136,7 @@ class Author (models.Model):
         
         if self.middle_name:
             _middle_name = self.middle_name[0] + '.'
+        else: _middle_name = ''
         
         return ' '.join((
             self.second_name,
@@ -135,21 +148,21 @@ class Author (models.Model):
        return self.short_name
        
     class Meta:
-        ordering = ['short_name']
+        ordering = ['second_name','first_name','middle_name']
         verbose_name = 'автор'
         verbose_name_plural = 'авторы'
 
 class Publisher (models.Model):
-	'''
-	Модель описывает каждое издательство,
-	в название не надо писать форму собственности
-	предприятием (слова "ООО", "ПАО"), а также само
-	слово "Издательство".\n
-	Правильно:\n
-	\tНаименование:\tЭксмо\n
-	Неправильно:\n
-	\t Наименование:\tООО "Издательство "Эксмо"
-	'''
+    '''
+    Модель описывает каждое издательство,
+    в название не надо писать форму собственности
+    предприятием (слова "ООО", "ПАО"), а также само
+    слово "Издательство".\n
+    Правильно:\n
+    \tНаименование:\tЭксмо\n
+    Неправильно:\n
+    \t Наименование:\tООО "Издательство "Эксмо"
+    '''
     name = models.CharField(
         max_length=65, 
         db_index=True, 
