@@ -46,15 +46,21 @@ class Book (models.Model):
         verbose_name='номер издания'
     )
     
-    inventory_number = models.SmallIntegerField(
-        verbose_name='инвентарный номер'
-    )
-    
     publishing_city = models.CharField(
         max_length=30,
         verbose_name="город издания",
         help_text = 'город издания книги, без "г. "'
     )
+    
+    inventory_number = models.SmallIntegerField(
+        verbose_name='инвентарный номер'
+    )
+    
+    def get_authors(self):
+        return ', '.join(
+            (str(i) for i in self.authors.all())
+        )
+    get_authors.short_description = "автор(-ы)"
     
     def __str__(self):
         return self.name
@@ -133,16 +139,19 @@ class Author (models.Model):
         because the Index out of bounds will be raised,
         if the person hasn't a middle_name (try do ''[0] + '.')
         '''
-        
         if self.middle_name:
-            _middle_name = self.middle_name[0] + '.'
-        else: _middle_name = ''
+            name_tuple = (
+                self.second_name,
+                self.first_name[0] + '.',
+                self.middle_name[0] + '.'
+            )
+        else:
+            name_tuple = (
+                self.second_name,
+                self.first_name[0] + '.',
+            )
         
-        return ' '.join((
-            self.second_name,
-            self.first_name[0] + '.',
-            _middle_name
-        ))
+        return ' '.join(name_tuple)
     
     def __str__(self):
        return self.short_name
