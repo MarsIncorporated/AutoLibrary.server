@@ -1,6 +1,17 @@
 from django.db import models
 
-# Create your models here.
+import barcodenumber
+from django.core.exceptions import ValidationError
+
+def ean13_validator(value):
+    if not barcodenumber.check_code(
+        'ean13',
+        str(value)
+    ):
+        raise ValidationError(
+            "%(value)s — не правильный штрихкод",
+            params = {'value':value}
+        )
 
 class Book (models.Model):
     '''
@@ -50,6 +61,10 @@ class Book (models.Model):
         max_length=30,
         verbose_name="город издания",
         help_text = 'город издания книги, без "г. "'
+    )
+    
+    isbn = models.BigIntegerField(
+        validators = [ean13_validator]
     )
     
     inventory_number = models.SmallIntegerField(

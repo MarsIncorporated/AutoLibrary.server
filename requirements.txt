@@ -1,3 +1,4 @@
+barcodenumber==0.2.1
 Django==2.2.1
 docutils==0.14
 pkg-resources==0.0.0
