@@ -9,7 +9,7 @@ def ean13_validator(value):
         str(value)
     ):
         raise ValidationError(
-            "%(value)s — не правильный штрихкод",
+            'контрольная сумма штрихкода "%(value)s" неверна, проверьте введённые данные',
             params = {'value':value}
         )
 
@@ -49,7 +49,7 @@ class Book (models.Model):
         verbose_name='издательство'
     )
     
-    year_of_publishing = models.SmallIntegerField(
+    year_of_publication = models.SmallIntegerField(
         verbose_name="год издания"
     )
     
@@ -57,21 +57,31 @@ class Book (models.Model):
         verbose_name='номер издания'
     )
     
-    publishing_city = models.CharField(
+    publication_city = models.CharField(
         max_length=30,
         verbose_name="город издания",
         help_text = 'город издания книги, без "г. "'
     )
     
     isbn = models.BigIntegerField(
-        validators = [ean13_validator]
+        unique = True,
+        primary_key = True,
+        validators = [ean13_validator],
+        verbose_name = 'ISBN код',
+        help_text = '''ISBN код книги, \
+указанный на штрих-коде сзади, уникален для каждого издания''',
     )
     
     inventory_number = models.SmallIntegerField(
-        verbose_name='инвентарный номер'
+        verbose_name='инвентарный номер',
+        help_text = 'инвентарный номер из Книги Учёта' #надо уточнить
     )
     
     def get_authors(self):
+        '''
+        выдает список авторов книги через запятую
+        '''
+        
         return ', '.join(
             (str(i) for i in self.authors.all())
         )
@@ -149,11 +159,13 @@ class Author (models.Model):
         возвращает короткое имя автора.
         Например: Пушкин А. С.
         '''
+        
         '''
         The if below is required
         because the Index out of bounds will be raised,
         if the person hasn't a middle_name (try do ''[0] + '.')
         '''
+        
         if self.middle_name:
             name_tuple = (
                 self.second_name,

@@ -4,7 +4,12 @@ from .models import Book, Author, Publisher
 # Register your models here.
 
 class BookAdmin(admin.ModelAdmin):
-    list_display=('name', 'get_authors', 'year_of_publishing')
+    list_display=(
+        'name',
+        'get_authors', 
+        'inventory_number',
+        'year_of_publication',
+    )
 #    fieldsets =
 
 admin.site.register(Book, BookAdmin)
