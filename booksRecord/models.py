@@ -28,6 +28,15 @@ class Book(models.Model):
     # You should write such comments for everything you make.
     # Read more here: https://docs.djangoproject.com/en/2.2/ref/contrib/admin/admindocs/
     
+    isbn = models.BigIntegerField(
+        unique=True,
+        primary_key=True,
+        validators=[ean13_validator],
+        verbose_name='ISBN код',
+        help_text='''ISBN код книги, \
+указанный на штрих-коде сзади, уникален для каждого издания''',
+    )
+    
     name = models.CharField(
         max_length=65, 
         db_index=True, 
@@ -62,15 +71,6 @@ class Book(models.Model):
         max_length=30,
         verbose_name="город издания",
         help_text='город издания книги, без "г. "'
-    )
-    
-    isbn = models.BigIntegerField(
-        unique=True,
-        primary_key=True,
-        validators=[ean13_validator],
-        verbose_name='ISBN код',
-        help_text='''ISBN код книги, \
-указанный на штрих-коде сзади, уникален для каждого издания''',
     )
     
     inventory_number = models.SmallIntegerField(
@@ -216,3 +216,24 @@ class Publisher(models.Model):
         ordering = ['name']
         verbose_name = 'издательство'
         verbose_name_plural = 'издательства'
+
+
+class BookInstance(models.Model):
+    '''
+    Описывает каждую книгу в библиотеке,
+    каждый экземпляр.
+    '''
+    
+    id = models.PositiveIntegerField(
+        primary_key=True,
+        unique=True,
+        verbose_name="индивидуальный идентификатор",
+        help_text='''идентификатор книги, уникальный для \
+каждого экземпляра; совпадает с номером на наклейке со штрихкодом'''
+    )
+    
+    book = models.ForeignKey(
+        verbose_name="книга",
+        help_text='''ссылка на модель Книга \
+:Model:`booksRecord.Book`'''
+    )
