@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import Book, Author, Publisher
 # Register your models here.
 
+@admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     list_display=(
         'name',
@@ -12,6 +13,5 @@ class BookAdmin(admin.ModelAdmin):
     )
 #    fieldsets =
 
-admin.site.register(Book, BookAdmin)
 admin.site.register(Author)
 admin.site.register(Publisher)
