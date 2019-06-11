@@ -10,10 +10,10 @@ def ean13_validator(value):
     ):
         raise ValidationError(
             'контрольная сумма штрихкода "%(value)s" неверна, проверьте введённые данные',
-            params = {'value':value}
+            params={'value':value}
         )
 
-class Book (models.Model):
+class Book(models.Model):
     '''
     Модель описывает любые книги в хранилище, будь то
     учебники или художественную литературу.
@@ -23,22 +23,23 @@ class Book (models.Model):
     К примеру, в хранилище есть 100 книг «Алгебра. 7 класс», 
     при этом в этой модели хранится ТОЛЬКО ОДНА запись.
     '''
-    # the comment above ↑ is to automatically generate a documentation
+    
+    # The comment above ↑ is to automatically generate a documentation.
     # You should write such comments for everything you make.
     # Read more here: https://docs.djangoproject.com/en/2.2/ref/contrib/admin/admindocs/
     
     name = models.CharField(
         max_length=65, 
         db_index=True, 
-        unique = True, 
+        unique=True, 
         verbose_name="название",
         help_text = 'Официальное название книги'
     )
     
     authors = models.ManyToManyField(
         'Author',
-        verbose_name = "автор(-ы)",
-        help_text = '''Автор или авторы книги, \
+        verbose_name="автор(-ы)",
+        help_text='''Автор или авторы книги, \
 ссылается на :Model:`booksRecord.Author`'''
     )
     
@@ -60,21 +61,21 @@ class Book (models.Model):
     publication_city = models.CharField(
         max_length=30,
         verbose_name="город издания",
-        help_text = 'город издания книги, без "г. "'
+        help_text='город издания книги, без "г. "'
     )
     
     isbn = models.BigIntegerField(
-        unique = True,
-        primary_key = True,
-        validators = [ean13_validator],
-        verbose_name = 'ISBN код',
-        help_text = '''ISBN код книги, \
+        unique=True,
+        primary_key=True,
+        validators=[ean13_validator],
+        verbose_name='ISBN код',
+        help_text='''ISBN код книги, \
 указанный на штрих-коде сзади, уникален для каждого издания''',
     )
     
     inventory_number = models.SmallIntegerField(
         verbose_name='инвентарный номер',
-        help_text = 'инвентарный номер из Книги Учёта' #надо уточнить
+        help_text='инвентарный номер из Книги Учёта' #надо уточнить
     )
     
     def get_authors(self):
@@ -82,9 +83,9 @@ class Book (models.Model):
         выдает список авторов книги через запятую
         '''
         
-        return ', '.join(
-            (str(i) for i in self.authors.all())
-        )
+        return ', '.join((
+            str(i) for i in self.authors.all()
+        ))
     get_authors.short_description = "автор(-ы)"
     
     def __str__(self):
@@ -95,7 +96,7 @@ class Book (models.Model):
         verbose_name = 'книга'
         verbose_name_plural = 'книги'
 
-class Author (models.Model):
+class Author(models.Model):
     '''
     Модель описывает всех авторов книг в библиотеке,
     Ф.И.О. заполняется полностью.\n
@@ -188,7 +189,7 @@ class Author (models.Model):
         verbose_name = 'автор'
         verbose_name_plural = 'авторы'
 
-class Publisher (models.Model):
+class Publisher(models.Model):
     '''
     Модель описывает каждое издательство,
     в название не надо писать форму собственности
@@ -202,9 +203,9 @@ class Publisher (models.Model):
     name = models.CharField(
         max_length=65, 
         db_index=True, 
-        unique = True, 
+        unique=True, 
         verbose_name="наименование",
-        help_text = '''Официальное наименование 
+        help_text='''Официальное наименование 
 издательства, без слов "Издательство", "ООО", "ПАО" и т. п.'''
     )
     
