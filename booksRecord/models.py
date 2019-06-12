@@ -233,6 +233,8 @@ class BookInstance(models.Model):
     )
     
     book = models.ForeignKey(
+        "Book",
+        on_delete=models.CASCADE,
         verbose_name="книга",
         help_text='''ссылка на модель Книга \
 :Model:`booksRecord.Book`'''
