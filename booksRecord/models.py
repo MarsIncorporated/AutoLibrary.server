@@ -1,7 +1,8 @@
 from django.db import models
-
 import barcodenumber
 from django.core.exceptions import ValidationError
+
+import core.models
 
 def ean13_validator(value):
     if not barcodenumber.check_code(
@@ -96,7 +97,7 @@ class Book(models.Model):
         verbose_name = 'книга'
         verbose_name_plural = 'книги'
 
-class Author(models.Model):
+class Author(core.models.Human):
     '''
     Модель описывает всех авторов книг в библиотеке,
     Ф.И.О. заполняется полностью.\n
@@ -120,72 +121,8 @@ class Author(models.Model):
     \tИмя:\tJack\n
     \tОтчество:\tGriffith
     '''
-    
-    second_name = models.CharField(
-        max_length=25,
-        verbose_name='фамилия',
-        blank=False,
-        help_text='Фамилия автора кириллицей'
-    )
-    
-    first_name = models.CharField(
-        max_length=25,
-        verbose_name='имя',
-        blank=False,
-        help_text='Имя автора кириллицей'
-    )
-    
-    middle_name = models.CharField(
-        max_length=25,
-        verbose_name='отчество',
-        blank=True,
-        help_text='Отчество автора кириллицей, необязательно'
-    )
-    
-    @property
-    def full_name(self):
-        '''
-        возвращает полное имя автора.\n
-        Например: Пушкин Александр Сергеевич
-        '''
-        return ' '.join((
-            self.second_name, 
-            self.first_name, 
-            self.middle_name
-        ))
-    
-    @property
-    def short_name(self):
-        '''
-        возвращает короткое имя автора.
-        Например: Пушкин А. С.
-        '''
-        
-        '''
-        The if below is required
-        because the Index out of bounds will be raised,
-        if the person hasn't a middle_name (try do ''[0] + '.')
-        '''
-        
-        if self.middle_name:
-            name_tuple = (
-                self.second_name,
-                self.first_name[0] + '.',
-                self.middle_name[0] + '.'
-            )
-        else:
-            name_tuple = (
-                self.second_name,
-                self.first_name[0] + '.',
-            )
-        
-        return ' '.join(name_tuple)
-    
-    def __str__(self):
-       return self.short_name
        
-    class Meta:
-        ordering = ['second_name','first_name','middle_name']
+    class Meta(core.models.Human.Meta):
         verbose_name = 'автор'
         verbose_name_plural = 'авторы'
 
