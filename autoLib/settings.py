@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'readersRecord.apps.ReadersrecordConfig',
     'booksRecord.apps.BooksrecordConfig',
     
     'django.contrib.admindocs',
