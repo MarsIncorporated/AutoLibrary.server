@@ -1,18 +1,9 @@
 from django.db import models
-import barcodenumber
-from django.core.exceptions import ValidationError
 
 import core.models
+import readersRecord
+from . import validators
 
-def ean13_validator(value):
-    if not barcodenumber.check_code(
-        'ean13',
-        str(value)
-    ):
-        raise ValidationError(
-            'контрольная сумма штрихкода "%(value)s" неверна, проверьте введённые данные',
-            params={'value':value}
-        )
 
 class Book(models.Model):
     '''
@@ -32,7 +23,7 @@ class Book(models.Model):
     isbn = models.BigIntegerField(
         unique=True,
         primary_key=True,
-        validators=[ean13_validator],
+        validators=[validators.ean13_validator],
         verbose_name='ISBN код',
         help_text='''ISBN код книги, \
 указанный на штрих-коде сзади, уникален для каждого издания''',
@@ -40,8 +31,6 @@ class Book(models.Model):
     
     name = models.CharField(
         max_length=65, 
-        db_index=True, 
-        unique=True, 
         verbose_name="название",
         help_text = 'Официальное название книги'
     )
@@ -53,15 +42,15 @@ class Book(models.Model):
 ссылается на :Model:`booksRecord.Author`'''
     )
     
+    year_of_publication = models.SmallIntegerField(
+        verbose_name="год издания"
+    )
+    
     publisher = models.ForeignKey(
         'Publisher',
         on_delete=models.PROTECT,
         db_index=False,
         verbose_name='издательство'
-    )
-    
-    year_of_publication = models.SmallIntegerField(
-        verbose_name="год издания"
     )
     
     edition = models.SmallIntegerField(
@@ -74,9 +63,26 @@ class Book(models.Model):
         help_text='город издания книги, без "г. "'
     )
     
-    inventory_number = models.SmallIntegerField(
+    grade = models.CharField(
+        max_length=5,
+        verbose_name="класс",
+        blank=True,
+        help_text='''Для учебных книг. Может быть диапазоном, к примеру: \
+«Физика. Задачник. 7-9 класс»''',
+        validators=[validators.grade_validator]
+    )
+    
+    subject = models.ForeignKey(
+        "Subject",
+        on_delete=models.CASCADE,
+        verbose_name="предмет",
+        blank=True,
+        null=True
+    )
+    
+    inventory_number = models.PositiveSmallIntegerField(
         verbose_name='инвентарный номер',
-        help_text='инвентарный номер из Книги Учёта' #надо уточнить
+        help_text='инвентарный номер из Книги Учёта' #should be specified
     )
     
     def get_authors(self):
@@ -85,7 +91,7 @@ class Book(models.Model):
         '''
         
         return ', '.join((
-            str(i) for i in self.authors.all()
+            str(i) for i in self.authors.all() # that may be too expensive
         ))
     get_authors.short_description = "автор(-ы)"
     
@@ -93,6 +99,12 @@ class Book(models.Model):
         return self.name
         
     class Meta:
+        indexes = [
+            models.Index(fields=["name"]),
+            models.Index(fields=['inventory_number']),
+            models.Index(fields=["grade", "subject"])
+        ]
+        
         ordering = ['name']
         verbose_name = 'книга'
         verbose_name_plural = 'книги'
@@ -151,8 +163,30 @@ class Publisher(models.Model):
         
     class Meta:
         ordering = ['name']
+        indexes = [
+            models.Index(fields=["name"])
+        ]
         verbose_name = 'издательство'
         verbose_name_plural = 'издательства'
+
+
+class Subject(models.Model):
+    '''
+    Модель описывает учебные предметы.
+    Например: "Математика", "Геометрия", "Русский язык"
+    '''
+    
+    name = models.CharField(
+        max_length=25,
+        verbose_name="название"
+    )
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=["name"])
+        ]
+        verbose_name = 'предмет'
+        verbose_name_plural = 'предметы'
 
 
 class BookInstance(models.Model):
@@ -166,7 +200,7 @@ class BookInstance(models.Model):
         unique=True,
         verbose_name="индивидуальный идентификатор",
         help_text='''идентификатор книги, уникальный для \
-каждого экземпляра; совпадает с номером на наклейке со штрихкодом'''
+каждого экземпляра; совпадает с номером штрихкода на наклейке'''
     )
     
     book = models.ForeignKey(
@@ -176,3 +210,35 @@ class BookInstance(models.Model):
         help_text='''ссылка на модель Книга \
 :Model:`booksRecord.Book`'''
     )
+    
+    class Meta:
+        ordering = ["book"]
+        verbose_name = "экземпляр книги"
+        verbose_name_plural = "экземпляры книг"
+
+
+class TakenBook(models.Model):
+    '''
+    Модель описывает взятые экземпляры книг.
+    '''
+    
+    book = models.ForeignKey(
+        'Book',
+        on_delete=models.CASCADE,
+        verbose_name="книга",
+    )
+    
+    date_time = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Дата и время взятия"
+    )
+    
+    student = models.ForeignKey(
+        readersRecord.models.Student,
+        on_delete=models.CASCADE,
+        verbose_name="ученик"
+    )
+    
+    class Meta:
+        verbose_name = "взятый экземпляр книги"
+        verbose_name_plural = "взятые экземпляры книг"
