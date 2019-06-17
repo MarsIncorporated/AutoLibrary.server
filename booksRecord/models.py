@@ -181,6 +181,9 @@ class Subject(models.Model):
         verbose_name="название"
     )
     
+    def __str__(self):
+        return self.name
+    
     class Meta:
         indexes = [
             models.Index(fields=["name"])
@@ -211,6 +214,9 @@ class BookInstance(models.Model):
 :Model:`booksRecord.Book`'''
     )
     
+    def __str__(self):
+        return self.book
+    
     class Meta:
         ordering = ["book"]
         verbose_name = "экземпляр книги"
@@ -238,6 +244,9 @@ class TakenBook(models.Model):
         on_delete=models.CASCADE,
         verbose_name="ученик"
     )
+    
+    def __str__(self):
+        return self.book
     
     class Meta:
         verbose_name = "взятый экземпляр книги"
