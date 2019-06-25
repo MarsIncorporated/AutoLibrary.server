@@ -213,6 +213,7 @@ class BookInstance(models.Model):
     book = models.ForeignKey(
         "Book",
         on_delete=models.CASCADE,
+        db_index=False,
         verbose_name="книга",
         help_text='''ссылка на модель Книга \
 :Model:`booksRecord.Book`'''
@@ -222,7 +223,7 @@ class BookInstance(models.Model):
         return str(self.book)
     
     class Meta:
-        ordering = ["book"]
+        ordering = ["id"]
         verbose_name = "экземпляр книги"
         verbose_name_plural = "экземпляры книг"
 
@@ -238,6 +239,12 @@ class TakenBook(models.Model):
         verbose_name="книга",
     )
     
+    student = models.ForeignKey(
+        readersRecord.models.Student,
+        on_delete=models.CASCADE,
+        verbose_name="ученик"
+    )
+    
     when_taken = models.DateTimeField(
         auto_now_add=True,
         editable=False,
@@ -245,15 +252,9 @@ class TakenBook(models.Model):
     )
     
     when_returned = models.DateTimeField(
-        default=timezone.now() + timedelta(days=settings.READERSRECORD_DEFAULT_TAKING_PERIOD),
+        default=timezone.now() + timedelta(
+          days=settings.READERSRECORD_DEFAULT_TAKING_PERIOD),
         verbose_name="Дата и время возврата"
-    )
-        
-    
-    student = models.ForeignKey(
-        readersRecord.models.Student,
-        on_delete=models.CASCADE,
-        verbose_name="ученик"
     )
     
     def __str__(self):
