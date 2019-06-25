@@ -1,6 +1,7 @@
 from django.db import models
-
 from django.conf import settings
+from django.utils import timezone
+
 from datetime import timedelta
 
 import core.models
@@ -218,7 +219,7 @@ class BookInstance(models.Model):
     )
     
     def __str__(self):
-        return self.book
+        return str(self.book)
     
     class Meta:
         ordering = ["book"]
@@ -231,8 +232,8 @@ class TakenBook(models.Model):
     Модель описывает взятые экземпляры книг.
     '''
     
-    book = models.ForeignKey(
-        'Book',
+    book_instance = models.ForeignKey(
+        'BookInstance',
         on_delete=models.CASCADE,
         verbose_name="книга",
     )
@@ -244,7 +245,7 @@ class TakenBook(models.Model):
     )
     
     when_returned = models.DateTimeField(
-        default=when_taken + timedelta(days=settings.READERSRECORD_DEFAULT_TAKING_PERIOD),
+        default=timezone.now() + timedelta(days=settings.READERSRECORD_DEFAULT_TAKING_PERIOD),
         verbose_name="Дата и время возврата"
     )
         
@@ -256,7 +257,7 @@ class TakenBook(models.Model):
     )
     
     def __str__(self):
-        return self.book
+        return str(self.book_instance)
     
     class Meta:
         verbose_name = "взятый экземпляр книги"
