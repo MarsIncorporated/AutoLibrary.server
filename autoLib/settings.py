@@ -126,3 +126,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# readersRecord
+# The default period after taking of a book, 
+# when reader has to return a book.
+# Measured in days.
+
+READERSRECORD_DEFAULT_TAKING_PERIOD = 20  # days

@@ -1,5 +1,8 @@
 from django.db import models
 
+from django.conf import settings
+from datetime import timedelta
+
 import core.models
 import readersRecord
 from . import validators
@@ -234,10 +237,17 @@ class TakenBook(models.Model):
         verbose_name="книга",
     )
     
-    date_time = models.DateTimeField(
+    when_taken = models.DateTimeField(
         auto_now_add=True,
+        editable=False,
         verbose_name="Дата и время взятия"
     )
+    
+    when_returned = models.DateTimeField(
+        default=when_taken + timedelta(days=settings.READERSRECORD_DEFAULT_TAKING_PERIOD),
+        verbose_name="Дата и время возврата"
+    )
+        
     
     student = models.ForeignKey(
         readersRecord.models.Student,
