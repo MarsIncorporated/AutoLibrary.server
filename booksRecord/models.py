@@ -202,11 +202,16 @@ class BookInstance(models.Model):
     каждый экземпляр.
     '''
     
+    IN_STORAGE = 0
+    ON_HANDS = 1
+    EXPIRED = 2
+    WRITTEN_OFF = 3
+    
     STATUSES = (
-        (0, "в хранилище"),
-        (1, "на руках"),
-        (2, "истёк срок возврата"),
-        (3, "снята с учёта")
+        (IN_STORAGE, "в хранилище"),
+        (ON_HANDS, "на руках"),
+        (EXPIRED, "истёк срок возврата"),
+        (WRITTEN_OFF, "снята с учёта")
     )
     
     status = models.PositiveSmallIntegerField(
@@ -253,6 +258,7 @@ class TakenBook(models.Model):
     book_instance = models.ForeignKey(
         'BookInstance',
         on_delete=models.CASCADE,
+        limit_choices_to={'status': IN_STORAGE},
         verbose_name="книга",
     )
     
@@ -273,6 +279,10 @@ class TakenBook(models.Model):
           days=settings.READERSRECORD_DEFAULT_TAKING_PERIOD),
         verbose_name="Дата и время возврата"
     )
+    
+    def save(self, *args, **kwargs):
+        self.status = ON_HANDS
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return str(self.book_instance)
