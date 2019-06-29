@@ -216,13 +216,15 @@ class BookInstance(models.Model):
     
     status = models.PositiveSmallIntegerField(
         choices=STATUSES,
+        default=IN_STORAGE,
         verbose_name="статус"
     )
     
     id = models.PositiveIntegerField(
         primary_key=True,
         unique=True,
-        verbose_name="индивидуальный идентификатор",
+        verbose_name="ID",
+        validators=[validators.ean8_validator],
         help_text='''идентификатор книги, уникальный для \
 каждого экземпляра; совпадает с номером штрихкода на наклейке'''
     )
@@ -255,11 +257,15 @@ class TakenBook(models.Model):
         verbose_name='возвращена?'
     )
     
+    is_returned.boolean = True
+    
+    
     book_instance = models.ForeignKey(
         'BookInstance',
         on_delete=models.CASCADE,
-        limit_choices_to={'status': IN_STORAGE},
-        verbose_name="книга",
+        editable=False,
+        limit_choices_to={'status': BookInstance.IN_STORAGE},
+        verbose_name="экземпляр книги",
     )
     
     student = models.ForeignKey(
@@ -280,9 +286,16 @@ class TakenBook(models.Model):
         verbose_name="Дата и время возврата"
     )
     
+    
     def save(self, *args, **kwargs):
-        self.status = ON_HANDS
+        if not self.is_returned:
+            self.book_instance.status = BookInstance.ON_HANDS
+        else:
+            self.book_instance.status = BookInstance.IN_STORAGE
+        
+        self.book_instance.save()           
         super().save(*args, **kwargs)
+    
     
     def __str__(self):
         return str(self.book_instance)

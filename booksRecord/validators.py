@@ -14,6 +14,17 @@ def ean13_validator(value):
             'контрольная сумма штрихкода "%(value)s" неверна, проверьте введённые данные',
             params={'value':value}
         )
+
+def ean8_validator(value):
+    if not barcodenumber.check_code(
+        'ean8',
+        str(value)
+    ):
+        raise ValidationError(
+            'контрольная сумма штрихкода "%(value)s" неверна, проверьте введённые данные',
+            params={'value':value}
+        )
+
         
 _grade_regex = compile(r"(?:^1[01]|^\d)(?:(?:-)1[01]$|\d$)?")
 
