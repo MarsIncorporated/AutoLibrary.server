@@ -21,8 +21,7 @@ class Student(core.models.Human):
         verbose_name="Заметки"
     )
     
-    grade = models.CharField(
-        max_length=3,
+    grade = models.PositiveSmallIntegerField(
         choices=core.GRADES,
         verbose_name="класс",
         help_text="номер и литера класса"

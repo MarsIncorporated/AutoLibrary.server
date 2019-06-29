@@ -202,6 +202,18 @@ class BookInstance(models.Model):
     каждый экземпляр.
     '''
     
+    STATUSES = (
+        (0, "в хранилище"),
+        (1, "на руках"),
+        (2, "истёк срок возврата"),
+        (3, "снята с учёта")
+    )
+    
+    status = models.PositiveSmallIntegerField(
+        choices=STATUSES,
+        verbose_name="статус"
+    )
+    
     id = models.PositiveIntegerField(
         primary_key=True,
         unique=True,
@@ -233,6 +245,11 @@ class TakenBook(models.Model):
     Модель описывает взятые экземпляры книг.
     '''
     
+    is_returned = models.BooleanField(
+        default=False,
+        verbose_name='возвращена?'
+    )
+    
     book_instance = models.ForeignKey(
         'BookInstance',
         on_delete=models.CASCADE,
@@ -261,5 +278,7 @@ class TakenBook(models.Model):
         return str(self.book_instance)
     
     class Meta:
+        get_latest_by = "when_taken"
+        ordering = ["when_taken"]
         verbose_name = "взятый экземпляр книги"
         verbose_name_plural = "взятые экземпляры книг"
