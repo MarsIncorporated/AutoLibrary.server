@@ -52,19 +52,21 @@ class AuthorAdmin(admin.ModelAdmin):
 
 @admin.register(BookInstance)
 class BookInstanceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'book')
+    list_display = ('id', 'book', 'status',)
+    readonly_fields = ('status',)
+    fields = ('status', 'id', 'book')
 
 admin.site.register(Publisher)
 admin.site.register(Subject)
 
 @admin.register(TakenBook)
 class TakenBookAdmin(admin.ModelAdmin):
-    list_display = ('book_instance', 'when_taken',
-      'when_returned', 'student')
+    list_display = ('book_instance', 'is_returned',
+      'student', 'when_taken', 'when_returned',)
     
-    readonly_fields = ('when_taken',)  # the comma is required (to define a tuple)
+    readonly_fields = ('when_taken', 'book_instance')  # the comma is required (to define a tuple)
     
     fieldsets = (
-      (None, {'fields': ('book_instance', 'student')}),
+      (None, {'fields': ('is_returned', 'book_instance', 'student')}),
       (None, {'fields': ('when_taken', 'when_returned')}),
     )
