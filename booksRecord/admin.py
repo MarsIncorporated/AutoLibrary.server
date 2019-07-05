@@ -1,12 +1,8 @@
 from django.contrib import admin
 
-from .models import (
-    Book, Author, Publisher,
-    BookInstance, Subject,
-    TakenBook
-)
+from . import models
 
-@admin.register(Book)
+@admin.register(models.Book)
 class BookAdmin(admin.ModelAdmin):
     def number_of_instances(self):
         return self.bookinstance_set.count()
@@ -38,7 +34,7 @@ class BookAdmin(admin.ModelAdmin):
       }),
     )
 
-@admin.register(Author)
+@admin.register(models.Author)
 class AuthorAdmin(admin.ModelAdmin):
     def number_of_books(self):
         return self.book_set.count()
@@ -49,24 +45,31 @@ class AuthorAdmin(admin.ModelAdmin):
         number_of_books
     )    
 
+class TakenBookInline(admin.TabularInline):
+    model = models.TakenBook
+    readonly_fields = ('book_instance', 'student',
+      'when_taken', 'when_returned')
 
-@admin.register(BookInstance)
+@admin.register(models.BookInstance)
 class BookInstanceAdmin(admin.ModelAdmin):
     list_display = ('id', 'book', 'status',)
     readonly_fields = ('status',)
     fields = ('status', 'id', 'book')
+    inline = (TakenBookInline)
 
-admin.site.register(Publisher)
-admin.site.register(Subject)
+admin.site.register(models.Publisher)
+admin.site.register(models.Subject)
 
-@admin.register(TakenBook)
+'''
+@admin.register(models.TakenBook)
 class TakenBookAdmin(admin.ModelAdmin):
     list_display = ('book_instance', 'is_returned',
       'student', 'when_taken', 'when_returned',)
     
-    readonly_fields = ('when_taken', 'book_instance')  # the comma is required (to define a tuple)
+    readonly_fields = ('when_taken', 'book_instance')
     
     fieldsets = (
       (None, {'fields': ('is_returned', 'book_instance', 'student')}),
       (None, {'fields': ('when_taken', 'when_returned')}),
     )
+'''

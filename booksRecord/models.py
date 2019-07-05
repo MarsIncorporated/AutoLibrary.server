@@ -158,7 +158,7 @@ class Publisher(models.Model):
         db_index=True, 
         unique=True, 
         verbose_name="наименование",
-        help_text='''Официальное наименование 
+        help_text='''Официальное наименование \
 издательства, без слов "Издательство", "ООО", "ПАО" и т. п.'''
     )
     
@@ -243,6 +243,7 @@ class BookInstance(models.Model):
     
     class Meta:
         ordering = ["id"]
+        indexes = (models.Index(fields=('status')))
         verbose_name = "экземпляр книги"
         verbose_name_plural = "экземпляры книг"
 
@@ -261,6 +262,7 @@ class TakenBook(models.Model):
     
     
     book_instance = models.ForeignKey(
+        editable=False,
         'BookInstance',
         on_delete=models.CASCADE,
         editable=False,
@@ -269,6 +271,7 @@ class TakenBook(models.Model):
     )
     
     student = models.ForeignKey(
+        editable=False,
         readersRecord.models.Student,
         on_delete=models.CASCADE,
         verbose_name="ученик"
@@ -301,7 +304,8 @@ class TakenBook(models.Model):
         return str(self.book_instance)
     
     class Meta:
+        indexes = (models.Index(fields=('is_returned')))
         get_latest_by = "when_taken"
-        ordering = ["when_taken"]
+        ordering = ['is_taken', "when_taken"]
         verbose_name = "взятый экземпляр книги"
         verbose_name_plural = "взятые экземпляры книг"
