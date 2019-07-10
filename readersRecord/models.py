@@ -18,6 +18,7 @@ class Student(core.models.Human):
     
     notes = models.TextField(
         max_length=500,
+        blank=True,
         verbose_name="Заметки"
     )
     

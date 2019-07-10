@@ -85,6 +85,7 @@ class Book(models.Model):
     )
     
     inventory_number = models.PositiveSmallIntegerField(
+        unique=True,
         verbose_name='инвентарный номер',
         help_text='инвентарный номер из Книги Учёта' #should be specified
     )
@@ -144,8 +145,8 @@ class Author(core.models.Human):
 
 class Publisher(models.Model):
     '''
-    Модель описывает каждое издательство,
-    в название не надо писать форму собственности
+    Модель описывает каждое издательство.
+    В название НЕ НАДО писать форму собственности
     предприятием (слова "ООО", "ПАО"), а также само
     слово "Издательство".\n
     Правильно:\n
@@ -159,7 +160,7 @@ class Publisher(models.Model):
         unique=True, 
         verbose_name="наименование",
         help_text='''Официальное наименование \
-издательства, без слов "Издательство", "ООО", "ПАО" и т. п.'''
+издательства без слов "Издательство", "ООО", "ПАО" и т. п.'''
     )
     
     def __str__(self):
@@ -216,6 +217,7 @@ class BookInstance(models.Model):
     
     status = models.PositiveSmallIntegerField(
         choices=STATUSES,
+        editable=False,
         default=IN_STORAGE,
         verbose_name="статус"
     )
@@ -243,7 +245,7 @@ class BookInstance(models.Model):
     
     class Meta:
         ordering = ["id"]
-        indexes = (models.Index(fields=('status')))
+        indexes = (models.Index(fields=('status',)),)
         verbose_name = "экземпляр книги"
         verbose_name_plural = "экземпляры книг"
 
@@ -262,7 +264,6 @@ class TakenBook(models.Model):
     
     
     book_instance = models.ForeignKey(
-        editable=False,
         'BookInstance',
         on_delete=models.CASCADE,
         editable=False,
@@ -271,7 +272,6 @@ class TakenBook(models.Model):
     )
     
     student = models.ForeignKey(
-        editable=False,
         readersRecord.models.Student,
         on_delete=models.CASCADE,
         verbose_name="ученик"
@@ -304,8 +304,8 @@ class TakenBook(models.Model):
         return str(self.book_instance)
     
     class Meta:
-        indexes = (models.Index(fields=('is_returned')))
+        indexes = (models.Index(fields=('is_returned',)),)
         get_latest_by = "when_taken"
-        ordering = ['is_taken', "when_taken"]
+        ordering = ['is_returned', "when_taken"]
         verbose_name = "взятый экземпляр книги"
         verbose_name_plural = "взятые экземпляры книг"

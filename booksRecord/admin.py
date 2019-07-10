@@ -8,6 +8,9 @@ class BookAdmin(admin.ModelAdmin):
         return self.bookinstance_set.count()
     number_of_instances.short_description = "Количество экземпляров"
     
+    search_fields = ['name', 'authors__second_name', 'subject__name',
+                     'grade', 'isbn', 'inventory_number']
+    
     list_display=(
         'name',
         'get_authors', 
