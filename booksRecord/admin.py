@@ -18,6 +18,8 @@ class BookAdmin(admin.ModelAdmin):
         number_of_instances,
     )
     
+    autocomplete_fields = ['authors', 'publisher', 'subject']
+    
     fieldsets = (
       ("Идентификаторы", {'fields':
         ('isbn', 'inventory_number')
@@ -43,6 +45,8 @@ class AuthorAdmin(admin.ModelAdmin):
         return self.book_set.count()
     number_of_books.short_description = 'количество книг'
     
+    search_fields = ['second_name', 'first_name']
+    
     list_display = (
         '__str__',
         number_of_books
@@ -60,8 +64,13 @@ class BookInstanceAdmin(admin.ModelAdmin):
     fields = ('status', 'id', 'book')
     inline = (TakenBookInline)
 
-admin.site.register(models.Publisher)
-admin.site.register(models.Subject)
+@admin.register(models.Publisher)
+class PublisherAdmin(admin.ModelAdmin):
+    search_fields = ['name']
+
+@admin.register(models.Subject)
+class SubjectAdmin(admin.ModelAdmin):
+    search_fields = ['name']
 
 '''
 @admin.register(models.TakenBook)
