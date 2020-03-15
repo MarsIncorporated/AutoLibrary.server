@@ -73,7 +73,7 @@ class PublisherAdmin(admin.ModelAdmin):
 class SubjectAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
-'''
+
 @admin.register(models.TakenBook)
 class TakenBookAdmin(admin.ModelAdmin):
     list_display = ('book_instance', 'is_returned',
@@ -85,4 +85,3 @@ class TakenBookAdmin(admin.ModelAdmin):
       (None, {'fields': ('is_returned', 'book_instance', 'student')}),
       (None, {'fields': ('when_taken', 'when_returned')}),
     )
-'''
