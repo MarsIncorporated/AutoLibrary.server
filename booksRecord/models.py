@@ -307,5 +307,5 @@ class TakenBook(models.Model):
         indexes = (models.Index(fields=('is_returned',)),)
         get_latest_by = "when_taken"
         ordering = ['is_returned', "when_taken"]
-        verbose_name = "взятый экземпляр книги"
-        verbose_name_plural = "взятые экземпляры книг"
+        verbose_name_plural = 'акты взятия книг'
+        verbose_name = 'акт взятия книги'
