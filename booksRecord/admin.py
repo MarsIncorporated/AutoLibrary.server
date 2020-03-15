@@ -54,15 +54,16 @@ class AuthorAdmin(admin.ModelAdmin):
 
 class TakenBookInline(admin.TabularInline):
     model = models.TakenBook
-    readonly_fields = ('book_instance', 'student',
-      'when_taken', 'when_returned')
+    readonly_fields = ('is_returned', 'student', 'when_taken', 'when_returned',)
+    extra = 0
+    can_delete = False
 
 @admin.register(models.BookInstance)
 class BookInstanceAdmin(admin.ModelAdmin):
     list_display = ('id', 'book', 'status',)
     readonly_fields = ('status',)
     fields = ('status', 'id', 'book')
-    inline = (TakenBookInline)
+    inlines = (TakenBookInline,)
 
 @admin.register(models.Publisher)
 class PublisherAdmin(admin.ModelAdmin):
