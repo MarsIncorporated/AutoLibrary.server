@@ -19,18 +19,16 @@ class BookAdmin(admin.ModelAdmin):
     isbn_plus_name.short_description = 'ISBN — название'
     isbn_plus_name.admin_order_field = 'name'
     
-    search_fields = ['name', 'authors__second_name', 'subject__name',
+    search_fields = ['name', 'authors', 'subject__name',
                      'grade', 'isbn', 'inventory_number']
     
     list_display=(
         isbn_plus_name,
         'isbn',
-        'get_authors', 
+        'authors', 
         'inventory_number',
         number_of_instances,
     )
-    
-    autocomplete_fields = ['authors', 'publisher', 'subject']
     
     fieldsets = (
       ("Идентификаторы", {'fields':
