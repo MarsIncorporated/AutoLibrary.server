@@ -49,19 +49,6 @@ class BookAdmin(admin.ModelAdmin):
       }),
     )
 
-@admin.register(models.Author)
-class AuthorAdmin(admin.ModelAdmin):
-    def number_of_books(self):
-        return self.book_set.count()
-    number_of_books.short_description = 'количество книг'
-    
-    search_fields = ['second_name', 'first_name']
-    
-    list_display = (
-        '__str__',
-        number_of_books
-    )    
-
 class TakenBookInline(admin.TabularInline):
     model = models.TakenBook
     readonly_fields = ('is_returned', 'student', 'when_taken', 'when_returned',)
@@ -74,15 +61,6 @@ class BookInstanceAdmin(admin.ModelAdmin):
     readonly_fields = ('status',)
     fields = ('status', 'id', 'book')
     inlines = (TakenBookInline,)
-
-@admin.register(models.Publisher)
-class PublisherAdmin(admin.ModelAdmin):
-    search_fields = ['name']
-
-@admin.register(models.Subject)
-class SubjectAdmin(admin.ModelAdmin):
-    search_fields = ['name']
-
 
 @admin.register(models.TakenBook)
 class TakenBookAdmin(admin.ModelAdmin):
