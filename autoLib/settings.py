@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'readersRecord.apps.ReadersrecordConfig',
     'booksRecord.apps.BooksrecordConfig',
+    'booksOperations.apps.BooksoperationsConfig',
     
     'django.contrib.admindocs',
     'django.contrib.admin',
@@ -79,12 +80,8 @@ WSGI_APPLICATION = 'autoLib.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'autoLib',
-        'USER': 'autoLib_user',
-        'PASSWORD': '2Hg?B`X}X$P<qAZ^',
-        'HOST': 'localhost',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'autoLib.sqlite3'),
     }
 }
 
