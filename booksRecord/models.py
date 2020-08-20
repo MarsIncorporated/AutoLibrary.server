@@ -39,22 +39,18 @@ class Book(models.Model):
         help_text = 'Официальное название книги'
     )
     
-    authors = models.ManyToManyField(
-        'Author',
+    authors = models.CharField(
         verbose_name="автор(-ы)",
-        help_text='''Автор или авторы книги, \
-ссылается на :Model:`booksRecord.Author`'''
+        max_length=200
     )
     
     year_of_publication = models.SmallIntegerField(
         verbose_name="год издания"
     )
     
-    publisher = models.ForeignKey(
-        'Publisher',
-        on_delete=models.PROTECT,
-        db_index=False,
-        verbose_name='издательство'
+    publisher = models.CharField(
+        verbose_name='издательство',
+        max_length=20
     )
     
     edition = models.SmallIntegerField(
@@ -76,10 +72,9 @@ class Book(models.Model):
         validators=[validators.grade_validator]
     )
     
-    subject = models.ForeignKey(
-        "Subject",
-        on_delete=models.CASCADE,
+    subject = models.CharField(
         verbose_name="предмет",
+        max_length=20, 
         blank=True,
         null=True
     )
@@ -89,16 +84,6 @@ class Book(models.Model):
         verbose_name='инвентарный номер',
         help_text='инвентарный номер из Книги Учёта' #should be specified
     )
-    
-    def get_authors(self):
-        '''
-        выдает список авторов книги через запятую
-        '''
-        
-        return ', '.join((
-            str(i) for i in self.authors.all() # that may be too expensive
-        ))
-    get_authors.short_description = "автор(-ы)"
     
     def __str__(self):
         return self.name
@@ -113,89 +98,6 @@ class Book(models.Model):
         ordering = ['name']
         verbose_name = 'книга'
         verbose_name_plural = 'книги'
-
-class Author(core.models.Human):
-    '''
-    Модель описывает всех авторов книг в библиотеке,
-    Ф.И.О. заполняется полностью.\n
-    Правильно:\n
-    \tФамилия:\tПушкин\n
-    \tИмя:\tАлександр\n
-    \tОтчество:\tСергеевич\n
-    Неправильно:\n
-    \tФамилия:\tПушкин\n
-    \tИмя:\tА.\n
-    \tОтчество:\tС.\n
-    Для записи иностранных авторов 
-    использовать кириллицу, отчество
-    можно не указывать.\n
-    Правильно:\n
-    \tФамилия:\tЛондон\n
-    \tИмя:\tДжек\n
-    \tОтчество:\t\n
-    Неправильно:\n
-    \tФамилия:\tLondon\n
-    \tИмя:\tJack\n
-    \tОтчество:\tGriffith
-    '''
-       
-    class Meta(core.models.Human.Meta):
-        verbose_name = 'автор'
-        verbose_name_plural = 'авторы'
-
-class Publisher(models.Model):
-    '''
-    Модель описывает каждое издательство.
-    В название НЕ НАДО писать форму собственности
-    предприятием (слова "ООО", "ПАО"), а также само
-    слово "Издательство".\n
-    Правильно:\n
-    \tНаименование:\tЭксмо\n
-    Неправильно:\n
-    \t Наименование:\tООО "Издательство "Эксмо"
-    '''
-    name = models.CharField(
-        max_length=65, 
-        db_index=True, 
-        unique=True, 
-        verbose_name="наименование",
-        help_text='''Официальное наименование \
-издательства без слов "Издательство", "ООО", "ПАО" и т. п.'''
-    )
-    
-    def __str__(self):
-        return self.name
-        
-    class Meta:
-        ordering = ['name']
-        indexes = [
-            models.Index(fields=["name"])
-        ]
-        verbose_name = 'издательство'
-        verbose_name_plural = 'издательства'
-
-
-class Subject(models.Model):
-    '''
-    Модель описывает учебные предметы.
-    Например: "Математика", "Геометрия", "Русский язык"
-    '''
-    
-    name = models.CharField(
-        max_length=25,
-        verbose_name="название"
-    )
-    
-    def __str__(self):
-        return self.name
-    
-    class Meta:
-        indexes = [
-            models.Index(fields=["name"])
-        ]
-        verbose_name = 'предмет'
-        verbose_name_plural = 'предметы'
-
 
 class BookInstance(models.Model):
     '''
