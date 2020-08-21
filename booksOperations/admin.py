@@ -1,11 +1,13 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from . import models
 
 
 class BookTakingInline(admin.TabularInline):
     model = models.BookTaking
-    readonly_fields = ('is_returned', 'when_taken',)
+    readonly_fields = ('when_taken',)
+    raw_id_fields = ('book_instance',)
     extra = 0
     can_delete = False
 
@@ -25,7 +27,7 @@ class BookTakingAdmin(admin.ModelAdmin):
     list_display = (book_instance_id_plus_name, 'is_returned',
       'student', 'when_taken', 'when_returned',)
     
-    readonly_fields = ('when_taken', 'book_instance')
+    readonly_fields = ('when_taken',)
     list_filter = ('is_returned',)
     
     fieldsets = (

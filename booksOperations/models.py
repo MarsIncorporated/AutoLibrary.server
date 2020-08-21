@@ -23,7 +23,6 @@ class BookTaking(models.Model):
     book_instance = models.ForeignKey(
         booksRecord.models.BookInstance,
         on_delete=models.CASCADE,
-        editable=False,
         limit_choices_to={'status': booksRecord.models.BookInstance.IN_STORAGE},
         verbose_name="экземпляр книги",
     )
