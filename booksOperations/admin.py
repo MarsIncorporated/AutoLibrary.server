@@ -5,7 +5,7 @@ from . import models
 
 class BookTakingInline(admin.TabularInline):
     model = models.BookTaking
-    readonly_fields = ('is_returned', 'student', 'when_taken', 'when_returned',)
+    readonly_fields = ('is_returned', 'when_taken',)
     extra = 0
     can_delete = False
 
