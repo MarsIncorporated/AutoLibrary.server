@@ -36,7 +36,6 @@ class BookTaking(models.Model):
     
     when_taken = models.DateTimeField(
         auto_now_add=True,
-        editable=False,
         verbose_name="Дата и время взятия"
     )
     
@@ -46,15 +45,17 @@ class BookTaking(models.Model):
     
     when_returned = models.DateTimeField(
         default=get_return_date,
+        blank=True,
+        null=True,
         verbose_name="Дата и время возврата"
     )
     
     
     def save(self, *args, **kwargs):
         if not self.is_returned:
-            self.book_instance.status = booksRecord.BookInstance.ON_HANDS
+            self.book_instance.status = booksRecord.models.BookInstance.ON_HANDS
         else:
-            self.book_instance.status = booksRecord.BookInstance.IN_STORAGE
+            self.book_instance.status = booksRecord.models.BookInstance.IN_STORAGE
         
         self.book_instance.save()           
         super().save(*args, **kwargs)
