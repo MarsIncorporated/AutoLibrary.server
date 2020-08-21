@@ -40,9 +40,12 @@ class BookTaking(models.Model):
         verbose_name="Дата и время взятия"
     )
     
+    
+    def get_return_date():
+        return timezone.now() + timedelta(days=settings.READERSRECORD_DEFAULT_TAKING_PERIOD)
+    
     when_returned = models.DateTimeField(
-        default=timezone.now() + timedelta(
-          days=settings.READERSRECORD_DEFAULT_TAKING_PERIOD),
+        default=get_return_date,
         verbose_name="Дата и время возврата"
     )
     
