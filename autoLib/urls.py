@@ -20,3 +20,5 @@ urlpatterns = [
     path('admin/doc/', include('django.contrib.admindocs.urls')),
     path('admin/', admin.site.urls),
 ]
+
+admin.site.site_header = 'Библиотека МАОУ «‎МЛ № 1» города Магнитогорска‎'
