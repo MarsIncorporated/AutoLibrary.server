@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 
 from . import models
-import booksOperations
+import booksOperations.admin
 
 @admin.register(models.Book)
 class BookAdmin(admin.ModelAdmin):
