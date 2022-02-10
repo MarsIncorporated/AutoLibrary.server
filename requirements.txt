@@ -1,5 +1,5 @@
 barcodenumber==0.2.1
-Django==2.2.1
+Django==2.2.27
 docutils==0.14
 pytz==2019.1
 sqlparse==0.3.0
